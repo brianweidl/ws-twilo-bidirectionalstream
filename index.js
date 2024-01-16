@@ -10,15 +10,16 @@ async function getWavFile(streamSid){
   console.log('Setting to wav with wavefile');
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      let wav = new WaveFile(fs.readFileSync('output/speech-5s.wav'));
+      let wav = new WaveFile(fs.readFileSync('output/speech-5s.wav')); // Get audio file that was previously transformed from Mp3 (OpenAI)
       
-      wav.toBitDepth('8')
       wav.toSampleRate(8000);
       wav.toMuLaw()
       
-      fs.writeFileSync('output/format-twilio-audio.wav', wav.toBuffer());
+      fs.writeFileSync('output/format-twilio-audio.wav', wav.toBuffer()); // This sounds good
 
-      const audioPayloadWithoutHeaderBytes = Buffer.from(wav.data.samples).toString('base64');
+      console.log(Buffer.from(wav.data.samples));
+
+      const audioPayloadWithoutHeaderBytes = Buffer.from(wav.data.samples).toString('base64'); // Remove header bytes from wav file and encode base64
 
       const mediaPayload = {
         "event": "media",
@@ -26,7 +27,7 @@ async function getWavFile(streamSid){
         "media": {
           "payload": audioPayloadWithoutHeaderBytes,
         }
-      }
+      } // This is what Twilio expects
     
       resolve(mediaPayload);
   
@@ -39,7 +40,7 @@ async function convertToTwilioPayload(streamSid){
   ffmpeg()
         .input(inputMp3File)
         .audioCodec('pcm_s16le') // Set audio codec to PCM
-        .audioChannels(2) // Set the number of audio channels (2 for stereo)
+        .audioChannels(1) // Set the number of audio channels (1 for mono). Must be mono for Twilio.
         .audioFrequency(44100) // Set audio frequency to 44.1kHz
         .on('end', () => {
           console.log('Conversion finished!');
@@ -83,7 +84,7 @@ const server = Bun.serve({
           ws.send(JSON.stringify(payload));
         }
 
-        // await convertToTwilioPayload('')
+        await convertToTwilioPayload('')
             
       },
     },
