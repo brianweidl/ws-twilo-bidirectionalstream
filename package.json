@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "bun --watch run index.js",
+    "start": "bun --watch run src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "fluent-ffmpeg": "^2.1.2",
+    "openai": "^4.24.7",
     "wavefile": "^11.0.0"
   }
 }
